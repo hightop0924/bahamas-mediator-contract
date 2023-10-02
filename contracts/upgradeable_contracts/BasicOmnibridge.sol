@@ -164,6 +164,7 @@ abstract contract BasicOmnibridge is
 
         _handleTokens(_token, true, _recipient, _value);
     }
+    
 
     /**
      * @dev Handles the bridged tokens that are native to this chain.
@@ -232,25 +233,6 @@ abstract contract BasicOmnibridge is
         _setTokenAddressPair(_nativeToken, _bridgedToken);
     }
 
-        /**
-     * @dev Allows to pre-set the bridged token contract for not-yet bridged token.
-     * Only the owner can call this method.
-     * @param _nativeToken address of the token contract on the other side that was not yet bridged.
-     * @param _bridgedToken address of the bridged token contract.
-     */
-    function setCustomTokenAddressPair2(address _nativeToken, address _bridgedToken) external onlyOwner {
-        require(!isTokenRegistered(_bridgedToken));
-        require(nativeTokenAddress(_bridgedToken) == address(0));
-        require(bridgedTokenAddress(_nativeToken) == address(0));
-        // Unfortunately, there is no simple way to verify that the _nativeToken address
-        // does not belong to the bridged token on the other side,
-        // since information about bridged tokens addresses is not transferred back.
-        // Therefore, owner account calling this function SHOULD manually verify on the other side of the bridge that
-        // nativeTokenAddress(_nativeToken) == address(0) && isTokenRegistered(_nativeToken) == false.
-
-        _setTokenAddressPair(_nativeToken, _bridgedToken);
-    }
-
     /**
      * @dev Allows to send to the other network the amount of locked tokens that can be forced into the contract
      * without the invocation of the required methods. (e. g. regular transfer without a call to onTokenTransfer)
@@ -276,7 +258,7 @@ abstract contract BasicOmnibridge is
         }
         addTotalSpentPerDay(_token, getCurrentDay(), diff);
 
-        bytes memory data = _prepareMessage(address(0), _token, _receiver, diff, new bytes(0), true);
+        bytes memory data = _prepareMessage(address(0), _token, _receiver, diff, new bytes(0));
         bytes32 _messageId = _passMessage(data, true);
         _recordBridgeOperation(_messageId, _token, _receiver, diff);
     }
@@ -342,8 +324,7 @@ abstract contract BasicOmnibridge is
         address _token,
         address _receiver,
         uint256 _value,
-        bytes memory _data,
-        bool isErc20Token
+        bytes memory _data
     ) internal returns (bytes memory) {
         bool withData = _data.length > 0 || msg.sig == this.relayTokensAndCall.selector;
 
@@ -393,14 +374,8 @@ abstract contract BasicOmnibridge is
                         _value
                     );
         }
-
-        // HHW : add logic for erc20 -> erc20
-        if (isErc20Token) {
-            // Transfer
-        } else {
-            // process already known token that is bridged from other chain
-            IBurnableMintableERC677Token(_token).burn(_value);
-        }
+        // process already known token that is bridged from other chain
+        IBurnableMintableERC677Token(_token).burn(_value);
         return
             withData
                 ? abi.encodeWithSelector(

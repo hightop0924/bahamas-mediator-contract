@@ -39,9 +39,9 @@ async function deployOmnibridge() {
     forwardingRulesManager: forwardingRulesManager.address,
   })
 
-  await initHomeTokenPairs({
-    homeBridge: homeBridgeMediator.address,
-  });
+  // await initHomeTokenPairs({
+  //   homeBridge: homeBridgeMediator.address,
+  // });
 
   await initializeForeign({
     foreignBridge: foreignBridgeMediator.address,
@@ -49,9 +49,9 @@ async function deployOmnibridge() {
     tokenFactory: foreignTokenFactory.address,
   })
 
-  await initForeignTokenPairs({
-    foreignBridge: foreignBridgeMediator.address,
-  });
+  // await initForeignTokenPairs({
+  //   foreignBridge: foreignBridgeMediator.address,
+  // });
 
   console.log('\nDeployment has been completed.\n\n')
   console.log(`[   Home  ] Bridge Mediator: ${homeBridgeMediator.address}`)

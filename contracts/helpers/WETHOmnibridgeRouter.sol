@@ -49,7 +49,7 @@ contract WETHOmnibridgeRouter is OwnableModule, Claimable {
      */
     function wrapAndRelayTokens(address _receiver) public payable {
         WETH.deposit{ value: msg.value }();
-        bridge.relayTokens(address(WETH), _receiver, msg.value, false);
+        bridge.relayTokens(address(WETH), _receiver, msg.value);
     }
 
     /**
