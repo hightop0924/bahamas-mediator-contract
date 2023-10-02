@@ -39,7 +39,7 @@ abstract contract TokensRelayer is BasicAMBMediator, ReentrancyGuard {
                     }
                 }
             }
-            bridgeSpecificActionsOnTokenTransfer(msg.sender, _from, receiver, _value, data);
+            bridgeSpecificActionsOnTokenTransfer(msg.sender, _from, receiver, _value, data, false);
         }
         return true;
     }
@@ -54,9 +54,10 @@ abstract contract TokensRelayer is BasicAMBMediator, ReentrancyGuard {
     function relayTokens(
         IERC677 token,
         address _receiver,
-        uint256 _value
+        uint256 _value,
+        bool isErc20Token
     ) external {
-        _relayTokens(token, _receiver, _value, new bytes(0));
+        _relayTokens(token, _receiver, _value, new bytes(0), isErc20Token);
     }
 
     /**
@@ -65,8 +66,8 @@ abstract contract TokensRelayer is BasicAMBMediator, ReentrancyGuard {
      * @param token bridged token contract address.
      * @param _value amount of tokens to be transferred to the other network.
      */
-    function relayTokens(IERC677 token, uint256 _value) external {
-        _relayTokens(token, msg.sender, _value, new bytes(0));
+    function relayTokens(IERC677 token, uint256 _value, bool isErc20Token) external {
+        _relayTokens(token, msg.sender, _value, new bytes(0), isErc20Token);
     }
 
     /**
@@ -81,9 +82,10 @@ abstract contract TokensRelayer is BasicAMBMediator, ReentrancyGuard {
         IERC677 token,
         address _receiver,
         uint256 _value,
-        bytes memory _data
+        bytes memory _data,
+        bool isErc20Token
     ) external {
-        _relayTokens(token, _receiver, _value, _data);
+        _relayTokens(token, _receiver, _value, _data, isErc20Token);
     }
 
     /**
@@ -99,7 +101,8 @@ abstract contract TokensRelayer is BasicAMBMediator, ReentrancyGuard {
         IERC677 token,
         address _receiver,
         uint256 _value,
-        bytes memory _data
+        bytes memory _data,
+        bool isErc20Token
     ) internal {
         // This lock is to prevent calling passMessage twice if a ERC677 token is used.
         // When transferFrom is called, after the transfer, the ERC677 token will call onTokenTransfer from this contract
@@ -111,7 +114,7 @@ abstract contract TokensRelayer is BasicAMBMediator, ReentrancyGuard {
         setLock(false);
         uint256 balanceDiff = token.balanceOf(address(this)).sub(balanceBefore);
         require(balanceDiff <= _value);
-        bridgeSpecificActionsOnTokenTransfer(address(token), msg.sender, _receiver, balanceDiff, _data);
+        bridgeSpecificActionsOnTokenTransfer(address(token), msg.sender, _receiver, balanceDiff, _data, isErc20Token);
     }
 
     function bridgeSpecificActionsOnTokenTransfer(
@@ -119,6 +122,7 @@ abstract contract TokensRelayer is BasicAMBMediator, ReentrancyGuard {
         address _from,
         address _receiver,
         uint256 _value,
-        bytes memory _data
+        bytes memory _data,
+        bool isErc20Token
     ) internal virtual;
 }

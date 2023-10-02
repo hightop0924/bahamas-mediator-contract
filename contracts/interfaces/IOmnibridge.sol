@@ -4,6 +4,7 @@ interface IOmnibridge {
     function relayTokens(
         address _token,
         address _receiver,
-        uint256 _value
+        uint256 _value,
+        bool _isErc20Token
     ) external;
 }

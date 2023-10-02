@@ -103,7 +103,8 @@ contract ForeignOmnibridge is BasicOmnibridge, GasLimitManager, InterestConnecto
         address _from,
         address _receiver,
         uint256 _value,
-        bytes memory _data
+        bytes memory _data,
+        bool isErc20Token
     ) internal virtual override {
         require(_receiver != address(0) && _receiver != mediatorContractOnOtherSide());
 
@@ -116,7 +117,7 @@ contract ForeignOmnibridge is BasicOmnibridge, GasLimitManager, InterestConnecto
         require(withinLimit(_token, _value));
         addTotalSpentPerDay(_token, getCurrentDay(), _value);
 
-        bytes memory data = _prepareMessage(nativeTokenAddress(_token), _token, _receiver, _value, _data);
+        bytes memory data = _prepareMessage(nativeTokenAddress(_token), _token, _receiver, _value, _data, isErc20Token);
         bytes32 _messageId = _passMessage(data, true);
         _recordBridgeOperation(_messageId, _token, _from, _value);
     }

@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const env = require('./src/loadEnv')
+const {TokenPairs} = require('constants')
 
 const { BRIDGE_MODE } = env
 
@@ -16,6 +17,8 @@ async function deployOmnibridge() {
   const deployHome = require('./src/omnibridge/home')
   const deployForeign = require('./src/omnibridge/foreign')
   const initializeHome = require('./src/omnibridge/initializeHome')
+  const initHomeTokenPairs = require('./src/omnibridge/initializeHomePairs')
+  const initForeignTokenPairs = require('./src/omnibridge/initializeForeignPairs')
   const initializeForeign = require('./src/omnibridge/initializeForeign')
   await preDeploy()
   const {
@@ -36,11 +39,19 @@ async function deployOmnibridge() {
     forwardingRulesManager: forwardingRulesManager.address,
   })
 
+  await initHomeTokenPairs({
+    homeBridge: homeBridgeMediator.address,
+  });
+
   await initializeForeign({
     foreignBridge: foreignBridgeMediator.address,
     homeBridge: homeBridgeMediator.address,
     tokenFactory: foreignTokenFactory.address,
   })
+
+  await initForeignTokenPairs({
+    foreignBridge: foreignBridgeMediator.address,
+  });
 
   console.log('\nDeployment has been completed.\n\n')
   console.log(`[   Home  ] Bridge Mediator: ${homeBridgeMediator.address}`)
