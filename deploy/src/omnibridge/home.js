@@ -13,6 +13,7 @@ const {
   HOME_AMB_BRIDGE,
   HOME_MEDIATOR_REQUEST_GAS_LIMIT,
   HOME_TOKEN_NAME_SUFFIX,
+  HOME_WRAPPED_TOKEN_ADDRESS,
 } = require('../loadEnv')
 const { ZERO_ADDRESS } = require('../constants')
 
@@ -24,6 +25,7 @@ const {
   OmnibridgeFeeManager,
   SelectorTokenGasLimitManager,
   MultiTokenForwardingRulesManager,
+  WETHOmniRouther
 } = require('../loadContracts')
 
 async function deployHome() {
@@ -110,6 +112,14 @@ async function deployHome() {
   })
   console.log('[Home] Bridge Mediator Implementation: ', homeBridgeImplementation.options.address)
 
+  console.log('\n[Home] Deploying WETH Router implementation with the following parameters:')
+  console.log(`    TOKEN_NAME_SUFFIX: ${HOME_TOKEN_NAME_SUFFIX}\n`)
+  const wETHOmniRoutherImplementation = await deployContract(WETHOmniRouther, 
+    [ homeBridgeImplementation.options.address, HOME_WRAPPED_TOKEN_ADDRESS, HOME_BRIDGE_OWNER], {
+    nonce: nonce++,
+  })
+  console.log('[Home] WETH Router Deployed: ', wETHOmniRoutherImplementation.options.address)
+
   console.log('\n[Home] Hooking up Mediator storage to Mediator implementation')
   await upgradeProxy({
     proxy: homeBridgeStorage,
@@ -125,6 +135,7 @@ async function deployHome() {
     feeManager: { address: feeManager },
     gasLimitManager: { address: gasLimitManager.options.address },
     forwardingRulesManager: { address: forwardingRulesManager },
+    WETHOmniRouter: { address: wETHOmniRoutherImplementation.options.address }
   }
 }
 

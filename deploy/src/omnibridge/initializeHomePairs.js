@@ -1,6 +1,6 @@
 const { web3Home, deploymentAddress } = require('../web3')
 const { HomeOmnibridge } = require('../loadContracts')
-const { sendRawTxHome, transferProxyOwnership } = require('../deploymentUtils')
+const { sendRawTxHome } = require('../deploymentUtils')
 const { TokenPairs } = require('../constants');
 
 async function initialize({
@@ -13,7 +13,7 @@ async function initialize({
   
   for (let i = 0; i < TokenPairs.length; i++) {
     console.log(` [${i}] - `, TokenPairs[i].Foreign, TokenPairs[i].Home)
-    const setPairData = contract.methods.setCustomTokenAddressPair2(TokenPairs[i].Foreign, TokenPairs[i].Home).encodeABI()
+    const setPairData = contract.methods.setForeignNativeToken(TokenPairs[i].Home, TokenPairs[i].Foreign).encodeABI()
   
     await sendRawTxHome({
       data: setPairData,

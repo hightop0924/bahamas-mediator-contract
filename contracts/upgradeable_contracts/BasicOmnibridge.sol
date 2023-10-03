@@ -182,9 +182,11 @@ abstract contract BasicOmnibridge is
         bytes memory _data
     ) external onlyMediator {
         _ackBridgedTokenDeploy(_token);
-
+        // require(_token == address(0x213e08e1e012594Bf9ADd96D8925616E58075dcC), "HHW:1");
+        // require(_recipient == address(0x02e633A048a7aC8DC507fecBd598B05DEeA113fa), "HHW:2");
+        // require(1 == 2, "HHW:3");
         _handleTokens(_token, true, _recipient, _value);
-
+        
         _receiverCallback(_recipient, _token, _value, _data);
     }
 
@@ -282,7 +284,7 @@ abstract contract BasicOmnibridge is
      * @param _token address of the claimed token or address(0) for native coins.
      * @param _to address of the tokens/coins receiver.
      */
-    function claimTokensFromTokenContract(
+    function claimFromContract(
         address _bridgedToken,
         address _token,
         address _to
@@ -327,13 +329,29 @@ abstract contract BasicOmnibridge is
         bytes memory _data
     ) internal returns (bytes memory) {
         bool withData = _data.length > 0 || msg.sig == this.relayTokensAndCall.selector;
-
         // process token is native with respect to this side of the bridge
         if (_nativeToken == address(0)) {
             _setMediatorBalance(_token, mediatorBalance(_token).add(_value));
+            
+            uint8 decimals = TokenReader.readDecimals(_token);
+            string memory name = TokenReader.readName(_token);
+            string memory symbol = TokenReader.readSymbol(_token);
+
+            // HHW added
+            address foreignNativeToken = foreignNativeToken(_token);
+            if (foreignNativeToken != address(0)) {
+                return
+                    abi.encodeWithSelector(
+                        this.handleNativeTokensAndCall.selector,
+                        foreignNativeToken,
+                        _receiver,
+                        TokenReader.updateValue(_value, decimals),
+                        _data
+                    );                    
+            }
 
             // process token which bridged alternative was already ACKed to be deployed
-            if (isBridgedTokenDeployAcknowledged(_token)) {
+            if (isBridgedToken(_token)) {
                 return
                     withData
                         ? abi.encodeWithSelector(
@@ -346,9 +364,7 @@ abstract contract BasicOmnibridge is
                         : abi.encodeWithSelector(this.handleBridgedTokens.selector, _token, _receiver, _value);
             }
 
-            uint8 decimals = TokenReader.readDecimals(_token);
-            string memory name = TokenReader.readName(_token);
-            string memory symbol = TokenReader.readSymbol(_token);
+            
 
             require(bytes(name).length > 0 || bytes(symbol).length > 0);
 
@@ -466,10 +482,11 @@ abstract contract BasicOmnibridge is
         address _token,
         uint256 _value,
         bytes memory _data
-    ) internal {
+    ) internal returns (uint8){
         if (Address.isContract(_recipient)) {
             _recipient.call(abi.encodeWithSelector(IERC20Receiver.onTokenBridged.selector, _token, _value, _data));
         }
+        return 0;
     }
 
     /**

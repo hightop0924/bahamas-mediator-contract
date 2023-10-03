@@ -669,9 +669,9 @@ function runTests(accounts, isHome) {
 
             const reverseData = contract.contract.methods.handleNativeTokens(token.address, user, halfEther).encodeABI()
 
-            expect(await contract.isBridgedTokenDeployAcknowledged(token.address)).to.be.equal(false)
+            expect(await contract.isBridgedToken(token.address)).to.be.equal(false)
             expect(await executeMessageCall(otherMessageId, reverseData)).to.be.equal(true)
-            expect(await contract.isBridgedTokenDeployAcknowledged(token.address)).to.be.equal(true)
+            expect(await contract.isBridgedToken(token.address)).to.be.equal(true)
 
             await send(halfEther).should.be.fulfilled
 
@@ -956,7 +956,7 @@ function runTests(accounts, isHome) {
           expect(await contract.mediatorBalance(token.address)).to.be.bignumber.equal(value)
           expect(await token.balanceOf(user)).to.be.bignumber.equal(ether('9'))
           expect(await token.balanceOf(contract.address)).to.be.bignumber.equal(value)
-          expect(await contract.isBridgedTokenDeployAcknowledged(token.address)).to.be.equal(true)
+          expect(await contract.isBridgedToken(token.address)).to.be.equal(true)
 
           const event = await getEvents(contract, { event: 'TokensBridged' })
           expect(event.length).to.be.equal(1)

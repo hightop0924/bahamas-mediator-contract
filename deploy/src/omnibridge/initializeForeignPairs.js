@@ -12,8 +12,8 @@ async function initialize({
   console.log('\n[Foreign] Initializing Token Pairs:')
   
   for (let i = 0; i < TokenPairs.length; i++) {
-    console.log(` [${i}] - `, TokenPairs[i].Home, TokenPairs[i].Foreign)
-    const setPairData = contract.methods.setCustomTokenAddressPair2(TokenPairs[i].Home, TokenPairs[i].Foreign).encodeABI()
+    console.log(` [${i}] - ${TokenPairs[i].Foreign} <-> ${TokenPairs[i].Home}`)
+    const setPairData = contract.methods.setForeignNativeToken(TokenPairs[i].Foreign, TokenPairs[i].Home).encodeABI()
   
     await sendRawTxForeign({
       data: setPairData,

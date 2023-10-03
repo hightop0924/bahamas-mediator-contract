@@ -92,6 +92,8 @@ switch (BRIDGE_MODE) {
       FOREIGN_TOKEN_FACTORY: optionalAddressValidator(),
       HOME_TOKEN_NAME_SUFFIX: suffixValidator(),
       FOREIGN_TOKEN_NAME_SUFFIX: suffixValidator(),
+      HOME_WRAPPED_TOKEN_ADDRESS: optionalAddressValidator(),
+      FOREIGN_NATIVE_CURRENCY: optionalAddressValidator(),
     }
 
     if (HOME_REWARDABLE === 'BOTH_DIRECTIONS') {

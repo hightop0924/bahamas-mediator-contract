@@ -10,12 +10,13 @@ interface ITokenDetails {
     function DECIMALS() external view;
 }
 // solhint-enable
-
+import "@openzeppelin/contracts/math/SafeMath.sol";
 /**
  * @title TokenReader
  * @dev Helper methods for reading name/symbol/decimals parameters from ERC20 token contracts.
  */
 library TokenReader {
+    using SafeMath for uint256;
     /**
      * @dev Reads the name property of the provided token.
      * Either name() or NAME() method is used.
@@ -95,5 +96,15 @@ library TokenReader {
         } else {
             return "";
         }
+    }
+
+    function updateValue(uint256 _value, uint8 _decimals) internal view returns (uint256) {
+        uint256 value;
+        if (_decimals == 18) {
+            value = _value.div(10 ** 9);
+        } else {
+            value = _value.mul(10 ** 9);
+        }
+        return value;
     }
 }

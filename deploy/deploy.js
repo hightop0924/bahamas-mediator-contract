@@ -17,8 +17,8 @@ async function deployOmnibridge() {
   const deployHome = require('./src/omnibridge/home')
   const deployForeign = require('./src/omnibridge/foreign')
   const initializeHome = require('./src/omnibridge/initializeHome')
-  const initHomeTokenPairs = require('./src/omnibridge/initializeHomePairs')
-  const initForeignTokenPairs = require('./src/omnibridge/initializeForeignPairs')
+  const initHomeNativeTokenPairs = require('./src/omnibridge/initializeHomePairs')
+  const initNativeForeignTokenPairs = require('./src/omnibridge/initializeForeignPairs')
   const initializeForeign = require('./src/omnibridge/initializeForeign')
   await preDeploy()
   const {
@@ -27,6 +27,7 @@ async function deployOmnibridge() {
     feeManager,
     gasLimitManager,
     forwardingRulesManager,
+    WETHOmniRouter
   } = await deployHome()
   const { foreignBridgeMediator, tokenFactory: foreignTokenFactory } = await deployForeign()
 
@@ -39,9 +40,9 @@ async function deployOmnibridge() {
     forwardingRulesManager: forwardingRulesManager.address,
   })
 
-  // await initHomeTokenPairs({
-  //   homeBridge: homeBridgeMediator.address,
-  // });
+  await initHomeNativeTokenPairs({
+    homeBridge: homeBridgeMediator.address,
+  });
 
   await initializeForeign({
     foreignBridge: foreignBridgeMediator.address,
@@ -49,16 +50,18 @@ async function deployOmnibridge() {
     tokenFactory: foreignTokenFactory.address,
   })
 
-  // await initForeignTokenPairs({
-  //   foreignBridge: foreignBridgeMediator.address,
-  // });
+  await initNativeForeignTokenPairs({
+    foreignBridge: foreignBridgeMediator.address,
+  });
 
   console.log('\nDeployment has been completed.\n\n')
   console.log(`[   Home  ] Bridge Mediator: ${homeBridgeMediator.address}`)
+  console.log(`            WETH Routher   : ${WETHOmniRouter.address}`)
   console.log(`[ Foreign ] Bridge Mediator: ${foreignBridgeMediator.address}`)
   writeDeploymentResults({
     homeBridge: {
       homeBridgeMediator,
+      WETHOmniRouter
     },
     foreignBridge: {
       foreignBridgeMediator,

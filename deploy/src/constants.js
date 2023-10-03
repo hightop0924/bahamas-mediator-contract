@@ -1,3 +1,10 @@
+const env = require('./loadEnv')
+
+const {
+  HOME_WRAPPED_TOKEN_ADDRESS,
+  FOREIGN_NATIVE_CURRENCY,
+} = env
+
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const EXPLORER_TYPES = {
@@ -8,10 +15,12 @@ const REQUEST_STATUS = {
   OK: 'OK',
 }
 
+// HHW
+// TODO : change to mainnet
 const TokenPairs = [
   {
-    Home: "0x213e08e1e012594Bf9ADd96D8925616E58075dcC",
-    Foreign: "0x0Ba2B3884d0bFE1FcDf6b3E142b68DC36e022Cc7"
+    Home: HOME_WRAPPED_TOKEN_ADDRESS,
+    Foreign: FOREIGN_NATIVE_CURRENCY
   }
 ]
 

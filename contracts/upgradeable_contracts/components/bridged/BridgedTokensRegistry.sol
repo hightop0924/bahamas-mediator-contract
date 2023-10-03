@@ -8,6 +8,25 @@ import "../../../upgradeability/EternalStorage.sol";
  */
 contract BridgedTokensRegistry is EternalStorage {
     event NewTokenRegistered(address indexed nativeToken, address indexed bridgedToken);
+    event NewNativeTokenRegistered(address indexed nativeToken, address indexed bridgedToken);
+
+    /** HHW added
+     * @dev Retrieves address of the bridged native token contract associated with a specific native token contract on the other side.
+     * @param _homeNativeToken address of the native token contract on the this side.
+     * @return address of the native bridged token contract.
+     */
+    function foreignNativeToken(address _homeNativeToken) public view returns (address) {
+        return nativeAddressStorage[keccak256(abi.encodePacked("homeNativeToken", _homeNativeToken))];
+    }
+
+    /** HHW added
+     * @dev Retrieves address of the bridged native token contract associated with a specific native token contract on the other side.
+     * @param _homeNativeToken address of the native token contract on the this side.
+     * @param _foreignNativeToken address of the native token contract on the other side.
+     */
+    function setForeignNativeToken(address _homeNativeToken, address _foreignNativeToken) public {
+        nativeAddressStorage[keccak256(abi.encodePacked("homeNativeToken", _homeNativeToken))] = _foreignNativeToken;
+    }
 
     /**
      * @dev Retrieves address of the bridged token contract associated with a specific native token contract on the other side.

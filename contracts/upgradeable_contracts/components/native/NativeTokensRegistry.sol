@@ -12,7 +12,7 @@ contract NativeTokensRegistry is EternalStorage {
      * @param _token address of native token contract.
      * @return true, if bridged token was already deployed.
      */
-    function isBridgedTokenDeployAcknowledged(address _token) public view returns (bool) {
+    function isBridgedToken(address _token) public view returns (bool) {
         return boolStorage[keccak256(abi.encodePacked("ackDeploy", _token))];
     }
 
