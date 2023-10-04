@@ -242,9 +242,9 @@ contract TokensBridgeLimits is EternalStorage, Ownable {
      */
     function _setLimits(address _token, uint256[3] memory _limits) internal {
         require(
-            _limits[2] > 0 && // minPerTx > 0
-                _limits[1] > _limits[2] && // maxPerTx > minPerTx
-                _limits[0] > _limits[1] // dailyLimit > maxPerTx
+            _limits[2] >= 0 && // minPerTx > 0
+                _limits[1] >= _limits[2] && // maxPerTx > minPerTx
+                _limits[0] >= _limits[1] // dailyLimit > maxPerTx
         );
 
         uintStorage[keccak256(abi.encodePacked("dailyLimit", _token))] = _limits[0];
@@ -260,7 +260,7 @@ contract TokensBridgeLimits is EternalStorage, Ownable {
      * @param _limits [ 0 = executionDailyLimit, 1 = executionMaxPerTx ].
      */
     function _setExecutionLimits(address _token, uint256[2] memory _limits) internal {
-        require(_limits[1] < _limits[0]); // foreignMaxPerTx < foreignDailyLimit
+        require(_limits[1] <= _limits[0]); // foreignMaxPerTx < foreignDailyLimit
 
         uintStorage[keccak256(abi.encodePacked("executionDailyLimit", _token))] = _limits[0];
         uintStorage[keccak256(abi.encodePacked("executionMaxPerTx", _token))] = _limits[1];

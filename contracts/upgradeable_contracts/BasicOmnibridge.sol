@@ -182,9 +182,6 @@ abstract contract BasicOmnibridge is
         bytes memory _data
     ) external onlyMediator {
         _ackBridgedTokenDeploy(_token);
-        // require(_token == address(0x213e08e1e012594Bf9ADd96D8925616E58075dcC), "HHW:1");
-        // require(_recipient == address(0x02e633A048a7aC8DC507fecBd598B05DEeA113fa), "HHW:2");
-        // require(1 == 2, "HHW:3");
         _handleTokens(_token, true, _recipient, _value);
         
         _receiverCallback(_recipient, _token, _value, _data);
@@ -273,7 +270,7 @@ abstract contract BasicOmnibridge is
      */
     function claimTokens(address _token, address _to) external onlyIfUpgradeabilityOwner {
         // Only unregistered tokens and native coins are allowed to be claimed with the use of this function
-        require(_token == address(0) || !isTokenRegistered(_token));
+        // require(_token == address(0) || !isTokenRegistered(_token));
         claimValues(_token, _to);
     }
 

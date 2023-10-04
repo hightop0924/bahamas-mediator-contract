@@ -112,13 +112,6 @@ async function deployHome() {
   })
   console.log('[Home] Bridge Mediator Implementation: ', homeBridgeImplementation.options.address)
 
-  console.log('\n[Home] Deploying WETH Router implementation with the following parameters:')
-  console.log(`    TOKEN_NAME_SUFFIX: ${HOME_TOKEN_NAME_SUFFIX}\n`)
-  const wETHOmniRoutherImplementation = await deployContract(WETHOmniRouther, 
-    [ homeBridgeImplementation.options.address, HOME_WRAPPED_TOKEN_ADDRESS, HOME_BRIDGE_OWNER], {
-    nonce: nonce++,
-  })
-  console.log('[Home] WETH Router Deployed: ', wETHOmniRoutherImplementation.options.address)
 
   console.log('\n[Home] Hooking up Mediator storage to Mediator implementation')
   await upgradeProxy({
@@ -127,6 +120,16 @@ async function deployHome() {
     version: '1',
     nonce: nonce++,
   })
+
+  console.log('\n[Home] Deploying WETH Router implementation with the following parameters:')
+  console.log(`    Bridge Address: ${homeBridgeStorage.options.address}`)
+  console.log(`    WETH Address: ${HOME_WRAPPED_TOKEN_ADDRESS}`)
+  console.log(`    Router Owner: ${HOME_BRIDGE_OWNER}`)
+  const wETHOmniRoutherImplementation = await deployContract(WETHOmniRouther, 
+    [ homeBridgeStorage.options.address, HOME_WRAPPED_TOKEN_ADDRESS, HOME_BRIDGE_OWNER], {
+    nonce: nonce++,
+  })
+  console.log('[Home] WETH Router Deployed: ', wETHOmniRoutherImplementation.options.address)
 
   console.log('\nHome part of OMNIBRIDGE has been deployed\n')
   return {
